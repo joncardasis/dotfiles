@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/zsh
 set -e
 
 RED='\033[0;31m'
@@ -30,7 +30,7 @@ symlink_file() {
 link_bin_files() {
   for file in "$DOTFILES_DIR/bin"/*; do
     if [ -f "$file" ]; then
-      symlink_file "$file" "$USER_BIN_DIR/$(basename "$file")"
+      symlink_file "$file" "$USER_BIN_DIR/$(basename "${file%.*}")"
     fi
   done
 }
@@ -40,7 +40,9 @@ link_bin_files
 
 # Add user local bin PATH if not already present
 if [[ ":$PATH:" != *":$USER_BIN_DIR:"* ]]; then
-  echo "export PATH=\"$USER_BIN_DIR:\$PATH\"" >> "$HOME/.profile"
+  echo "export PATH=\"$USER_BIN_DIR:\$PATH\"" >> "$HOME/.zshrc"
 fi
 
-echo -e "\n${GREEN}✓ Dotfiles installed successfully${NC}"
+echo -e "${GREEN}✓ Dotfiles installed successfully${NC}"
+
+source "$HOME/.zshrc"
