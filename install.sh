@@ -3,11 +3,10 @@ set -e
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
+DIM='\033[2m'
 NC='\033[0m'
 
 DOTFILES_DIR=$(dirname "$(realpath "$0")")
-USER_BIN_DIR=$HOME/.local/bin
 
 symlink_file() {
   local src=$1
@@ -17,7 +16,7 @@ symlink_file() {
   mkdir -p "$(dirname "$dest")"
 
   # Check for existing non-symlink files at destination
-  if [ -e "$dest" ] && [ ! -L "$dest" ]; then
+  if [[ -e "$dest" && ! -L "$dest" ]]; then
     echo -e "${RED}Error: ${dest} exists as a non-symlink file"
     echo -e "Please remove the file or directory and try again${NC}"
     exit 1
@@ -27,22 +26,30 @@ symlink_file() {
   ln -sf "$src" "$dest"
 }
 
-link_bin_files() {
-  for file in "$DOTFILES_DIR/bin"/*; do
-    if [ -f "$file" ]; then
-      symlink_file "$file" "$USER_BIN_DIR/$(basename "${file%.*}")"
-    fi
-  done
+# Append line to .zshrc if not already present
+append_to_zshrc() {
+  local line=$1
+  if ! grep -qF "$line" "$HOME/.zshrc" 2>/dev/null; then
+    echo "$line" >> "$HOME/.zshrc"
+  fi
 }
 
-# Link bin programs
-link_bin_files
+setup_bin() {
+  local user_bin_dir=$HOME/.local/bin
 
-# Add user local bin PATH if not already present
-if [[ ":$PATH:" != *":$USER_BIN_DIR:"* ]]; then
-  echo "export PATH=\"$USER_BIN_DIR:\$PATH\"" >> "$HOME/.zshrc"
-fi
+  for file in "$DOTFILES_DIR/bin"/*; do
+    [[ -f "$file" ]] && symlink_file "$file" "$user_bin_dir/$(basename "${file%.*}")"
+  done
 
-echo -e "${GREEN}✓ Dotfiles installed successfully${NC}"
+  append_to_zshrc "export PATH=\"$user_bin_dir:\$PATH\""
+}
 
-source "$HOME/.zshrc"
+setup_zsh() {
+  append_to_zshrc "source $DOTFILES_DIR/zsh/aliases.zsh"
+}
+
+setup_bin
+echo -e "${DIM}✓ Symlink bin files to $HOME/.local/bin${NC}"
+setup_zsh
+echo -e "${DIM}✓ Add aliases to $HOME/.zshrc${NC}"
+echo -e "\n${GREEN}Dotfiles installed successfully${NC}"
