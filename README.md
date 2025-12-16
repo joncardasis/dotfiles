@@ -1,6 +1,12 @@
-# Dotfiles
+```
+   ██████   ██████  ████████ ███████ ██ ██      ███████ ███████ 
+   ██   ██ ██    ██    ██    ██      ██ ██      ██      ██      
+   ██   ██ ██    ██    ██    █████   ██ ██      █████   ███████ 
+   ██   ██ ██    ██    ██    ██      ██ ██      ██           ██ 
+██ ██████   ██████     ██    ██      ██ ███████ ███████ ███████ 
+```
 
-My personal configuration files.
+My personal configuration files for development workflow.
 
 ## Installation
 
