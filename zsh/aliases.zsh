@@ -5,8 +5,18 @@
 alias gitme="git config user.name 'Jon Cardasis' && git config user.email 'joncardasis@gmail.com'"
 alias gitwhoami="git config user.name && git config user.email"
 
-# glb = "git last branches" - list recently checked out branches
-alias glb="git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[\$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\" %12s\t\033[32m%s\033[0m\n\", substr(\$2, 1, length(\$2) - 1), \$1)}'"
+# Simple git aliases
+alias grebase="git pull --rebase origin main"
+alias gco="git checkout"
+alias gst="git status"
+alias gd="git diff"
+alias glo="git log --oneline --decorate"
+alias gcmsg="git commit --message"
+alias gfa="git fetch --all --tags --jobs=10"
+alias gl="git pull"
+
+# gch = "git checkout history" - list recently checked out branches
+alias gch="git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[\$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\" %12s\t\033[32m%s\033[0m\n\", substr(\$2, 1, length(\$2) - 1), \$1)}'"
 
 # Stash with options: "staged" stashes only staged changes, otherwise stashes unstaged
 gstash() {
@@ -26,9 +36,30 @@ ghpr() {
   open "$github_url/compare/main...$branch_name"
 }
 
+# Push current branch to origin
+function ggp () {
+  if [[ "$#" != 0 ]] && [[ "$#" != 1 ]]; then
+    git push origin "${*}"
+  else
+    [[ "$#" == 0 ]] && local b="$(git_current_branch)"
+    git push origin "${b:=$1}"
+  fi
+}
+
+# Worktree add
+function wta() {
+  local branch="$1"
+  local dir="${2:-$1}"
+  git worktree add "$dir" -B "$branch"
+}
+
 # -----------------------------------------------------------------------------
 # File System
 # -----------------------------------------------------------------------------
+
+alias desktop-hide="defaults write com.apple.finder CreateDesktop false; killall Finder"
+alias desktop-show="defaults write com.apple.finder CreateDesktop true; killall Finder"
+alias tempdir="TEMP_DIR=$(mktemp -d); echo 'Created temp directory at $TEMP_DIR'; cd $TEMP_DIR"
 
 # Rename all directories in current folder to UUIDs
 shuffle_dirs() {
@@ -59,6 +90,38 @@ shuffle_files() {
 # -----------------------------------------------------------------------------
 
 alias pi="pod install"
+
+# Get app sandbox for booted simulator
+function app-sandbox() {
+  bundle_ids=($(xcrun simctl listapps booted | grep CFBundleIdentifier | awk '{print $3}' | tr -d '";' | grep -v '^com\.apple'))
+
+  if [ ${#bundle_ids[@]} -eq 0 ]; then
+      echo "No apps found in booted simulator"
+      exit 1
+  fi
+
+  PS3=$'\nEnter selection: '  # Custom prompt instead of "#?"
+
+  echo "Bundle IDs:"
+  select bundle_id in "${bundle_ids[@]}" "Quit"; do
+    case $bundle_id in
+      "Quit")
+        exit 0
+        ;;
+      *)
+        if [ -n "$bundle_id" ]; then
+          echo "\nApp for $bundle_id:\n"
+          xcrun simctl get_app_container booted "$bundle_id" app
+          echo "\nData for $bundle_id:\n"
+          xcrun simctl get_app_container booted "$bundle_id" data
+          break
+        else
+          echo "Invalid selection"
+        fi
+        ;;
+    esac
+  done
+}
 
 # -----------------------------------------------------------------------------
 # Android
