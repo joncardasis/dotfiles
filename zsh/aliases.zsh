@@ -52,7 +52,7 @@ function ggp () {
 # Worktree add
 function wta() {
   local branch="$1"
-  local dir="${2:-$1}"
+  local dir="${2:-${1//\//-}}"
   git worktree add "$dir" -B "$branch"
 }
 
