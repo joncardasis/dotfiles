@@ -15,8 +15,11 @@ alias gcmsg="git commit --message"
 alias gfa="git fetch --all --tags --jobs=10"
 alias gl="git pull"
 
-# gch = "git checkout history" - list recently checked out branches
-alias gch="git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[\$1]++' | head -n 10 | awk -F' ~ HEAD@{' '{printf(\" %12s\t\033[32m%s\033[0m\n\", substr(\$2, 1, length(\$2) - 1), \$1)}'"
+# gch [n] - list the last n recently checked out branches (default: 10)
+gch() {
+  local n="${1:-10}"
+  git reflog show --pretty=format:'%gs ~ %gd' --date=relative | grep 'checkout:' | grep -oE '[^ ]+ ~ .*' | awk -F~ '!seen[$1]++' | head -n "$n" | awk -F' ~ HEAD@{' '{printf(" %12s\t\033[32m%s\033[0m\n", substr($2, 1, length($2) - 1), $1)}'
+}
 
 # Stash with options: "staged" stashes only staged changes, otherwise stashes unstaged
 gstash() {
