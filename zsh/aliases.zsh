@@ -64,6 +64,17 @@ alias desktop-hide="defaults write com.apple.finder CreateDesktop false; killall
 alias desktop-show="defaults write com.apple.finder CreateDesktop true; killall Finder"
 alias tempdir="TEMP_DIR=$(mktemp -d); echo 'Created temp directory at $TEMP_DIR'; cd $TEMP_DIR"
 
+# cdw [project] - cd to ~/Workspace or a particular project in Workspace
+function cdw() {
+  local target=~/Workspace/$1
+  if [[ -d "$target" ]]; then
+    builtin cd "$target"
+  else
+    echo "cdw: project not found: $1" >&2
+    return 1
+  fi
+}
+
 # Rename all directories in current folder to UUIDs
 shuffle_dirs() {
   echo "This will rename all directories in $PWD to UUIDs. Continue? (y/N)"
