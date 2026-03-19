@@ -103,8 +103,6 @@ shuffle_files() {
 # iOS / Xcode
 # -----------------------------------------------------------------------------
 
-alias pi="pod install"
-
 # Get app sandbox for booted simulator
 function app-sandbox() {
   bundle_ids=($(xcrun simctl listapps booted | grep CFBundleIdentifier | awk '{print $3}' | tr -d '";' | grep -v '^com\.apple'))
