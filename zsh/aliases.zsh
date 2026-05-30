@@ -63,6 +63,7 @@ function wta() {
 alias desktop-hide="defaults write com.apple.finder CreateDesktop false; killall Finder"
 alias desktop-show="defaults write com.apple.finder CreateDesktop true; killall Finder"
 alias tempdir="TEMP_DIR=$(mktemp -d); echo 'Created temp directory at $TEMP_DIR'; cd $TEMP_DIR"
+alias afk="caffeinate -d"
 
 # cdw [project] - cd to ~/Workspace or a particular project in Workspace
 function cdw() {
